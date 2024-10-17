@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ping-log-persistent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ping-log-persistent
+  template:
+    metadata:
+      labels:
+        app: ping-log-persistent
+    spec:
+      volumes:
+        - name: shared-file
+          persistentVolumeClaim:
+            claimName: ping-log-claim
+      containers:
+        - name: ping-pong
+          image: johanlindell/ping-pong:persistent2
+          ports:
+            - containerPort: 3001
+          volumeMounts:
+            - name: shared-file
+              mountPath: /usr/src/app/files
+        - name: log-output
+          image: johanlindell/log-output:persistent
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: shared-file
+              mountPath: /usr/src/app/files

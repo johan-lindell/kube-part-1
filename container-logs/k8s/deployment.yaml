@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-logs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: container-logs
+  template:
+    metadata:
+      labels:
+        app: container-logs
+    spec:
+      volumes: # Define volume
+        - name: shared-file
+          emptyDir: {}
+      containers:
+        - name: log-read
+          image: johanlindell/log-read:latest
+          ports:
+            - containerPort: 3000 
+          volumeMounts: # Mount volume
+          - name: shared-file
+            mountPath: /usr/src/app/files
+        - name: log-write
+          image: johanlindell/log-write:latest
+          volumeMounts: # Mount volume
+          - name: shared-file
+            mountPath: /usr/src/app/files
